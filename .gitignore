@@ -1,0 +1,10 @@
+venv/
+.idea/
+__pycache__/
+indexed_folders.json
+build/
+dist/
+tstdocs/
+local_misc/
+*.spec
+local_search/

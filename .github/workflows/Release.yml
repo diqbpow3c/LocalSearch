@@ -1,0 +1,43 @@
+name: Release (Windows)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Git tag for the release (e.g. v1.2.0)"
+        required: true
+      release_name:
+        description: "Release title"
+        required: true
+      prerelease:
+        description: "Mark as prerelease"
+        type: boolean
+        default: false
+      build_run_id:
+        description: 'The Run ID of the Build workflow'
+        required: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.inputs.build_run_id }}
+          name: LocalSearch-Windows
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          name: ${{ inputs.release_name }}
+          prerelease: ${{ inputs.prerelease }}
+          files: |
+            LocalSearch-Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
