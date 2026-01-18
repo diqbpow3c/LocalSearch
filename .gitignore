@@ -6,5 +6,4 @@ build/
 dist/
 tstdocs/
 local_misc/
-*.spec
 local_search/

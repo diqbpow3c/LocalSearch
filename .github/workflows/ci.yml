@@ -34,7 +34,8 @@ jobs:
       - name: Build with PyInstaller
         run: |
           python -m nltk.downloader punkt_tab averaged_perceptron_tagger_eng
-          pyinstaller.exe --noconsole --log-level=DEBUG --optimize 2  --icon ./resources/icon.png --add-data "./resources:resources" --contents-directory "."    --collect-all unstructured --collect-submodules scipy --collect-all requests   --noconfirm -n LocalSearch main.py
+          # pyinstaller.exe --noconsole --log-level=DEBUG --optimize 2  --icon ./resources/icon.png --add-data "./resources:resources" --contents-directory "."    --collect-all unstructured --collect-submodules scipy --collect-all requests   --noconfirm -n LocalSearch main.py
+          pyinstaller LocalSearch_custom.spec
       - name: Zip dist/LocalSearch
         run: |
           powershell Compress-Archive `
