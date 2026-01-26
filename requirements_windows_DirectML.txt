@@ -10,7 +10,6 @@ tokenizers
 pypdf
 sympy
 numpy
-torch
 onnxruntime-directml
 python-docx
 markdown
