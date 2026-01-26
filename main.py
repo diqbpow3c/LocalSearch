@@ -296,7 +296,8 @@ class SettingsTab(QWidget):
         if is_running_in_pyinstaller():
             command = app_path + " --autostart"
         else:
-            command = f'"{sys.executable}" "{script_path}" --autostart'
+            gpu_arg = ' --gpu' if '--gpu' in sys.argv else ''
+            command = f'"{sys.executable}" "{script_path}" --autostart {gpu_arg}'
         if sys.platform.startswith("win"):
             import winreg
 
@@ -497,9 +498,18 @@ class MainWindow(QMainWindow):
 
         # show the help window on first launch
         is_first_time_launch = self.settings.value("is_first_time_launch", 1)
-        if is_first_time_launch:
+        if is_first_time_launch  or True:
             self.settings_tab.on_help_button_pushed()
             self.settings.setValue("is_first_time_launch", 0)
+            if not is_running_in_pyinstaller():
+                from pyshortcuts import make_shortcut
+                script_path = Path(__file__).resolve()
+                gpu_arg = ' --gpu' if '--gpu' in sys.argv else ''
+                # command = f'"{sys.executable}" "{script_path}" {gpu_arg}'
+                command = f'"{script_path}" {gpu_arg}' # pyshortcuts already appends conda-related commands
+                icon_path = str(SCRIPT_DIR / "resources/icon.ico")
+                make_shortcut(command, name='LocalSearch', icon=icon_path,working_dir=str(SCRIPT_DIR),terminal=False)
+                logger.info("Shortcut created on desktop")
 
     def _load_config(self):
         """Loads configuration from a JSON file."""

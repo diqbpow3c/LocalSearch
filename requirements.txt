@@ -17,3 +17,4 @@ python-pptx
 qt_material
 pymupdf
 watchdog
+pyshortcuts

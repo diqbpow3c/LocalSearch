@@ -66,6 +66,7 @@ pip install -r ./requirements.txt
 # Make sure torch (GPU version) is installed, e.g., running
 pip3 install torch --index-url https://download.pytorch.org/whl/cu126 (or whatever cuda version you like)
 pip install -r ./requirements_gpu.txt
+pip uninstall orjson
 ```
 
 ## CPU usage
