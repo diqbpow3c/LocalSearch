@@ -498,7 +498,7 @@ class MainWindow(QMainWindow):
 
         # show the help window on first launch
         is_first_time_launch = self.settings.value("is_first_time_launch", 1)
-        if is_first_time_launch  or True:
+        if is_first_time_launch:
             self.settings_tab.on_help_button_pushed()
             self.settings.setValue("is_first_time_launch", 0)
             if not is_running_in_pyinstaller():
