@@ -2,7 +2,7 @@ import os, sys
 from pathlib import Path
 from collections import OrderedDict
 
-APP_VERSION = "0.0.2"
+APP_VERSION = "1.0.0"
 STOPWORDS = [" ", ",", "，", "。", "的", "‘", "’", "“", "”", "、","_","-"]
 SCRIPT_DIR = Path(__file__).resolve().parent
 
