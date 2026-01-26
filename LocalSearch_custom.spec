@@ -7,7 +7,7 @@ from pathlib import Path
 resource_dir = Path("./resources")
 datas = []
 for f in resource_dir.rglob("*"):
-    if f.is_file() and f.name != "model_GPU.onnx":
+    if f.is_file() and f.name != "model.onnx":
         datas.append((str(f), str(f.parent)))
 
 binaries = []
