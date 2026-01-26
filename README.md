@@ -46,13 +46,14 @@ That's why I developed this app.
 # Installation and usage
 `LocalSearch` can be used on Windows, Linux, and MacOS (not tested), as long as pyside6 and other required packages can be installed. 
 
-You can directly download from the release files if you are using Windows, and do not want to use GPU for faster embedding computation. Otherwise, follow the following steps:
+You can directly **download it from the release files** if you are on Windows. The release file is based on DirectML which can utilize GPU, but its performance may be slightly worse than CUDA. Otherwise, follow the following steps:
 
 First, download the repo (download zip file) or 
 ```
 git clone https://github.com/diqbpow3c/LocalSearch.git
 cd LocalSearch
 ```
+You might also need to use `git lfs pull` if the onnx model files are not properly downloaded to the `resources/embedding_model` directory.
 
 ## Requirements
 It is highly recommended to create a virtual environment, since this repo requires uninstalling orjson due to bugs with the `bm25s` package, which might break your existing dependencies. 
@@ -62,12 +63,13 @@ conda create -n LocalSearch python=3.13
 conda activate LocalSearch
 # for cpu usage
 pip install -r ./requirements.txt
-# for NVIDIA GPU usage
+# for CUDA GPU usage
 # Make sure torch (GPU version) is installed, e.g., running
-pip3 install torch --index-url https://download.pytorch.org/whl/cu126 (or whatever cuda version you like)
+pip install torch --index-url https://download.pytorch.org/whl/cu126 (or whatever cuda version you like)
 pip install -r ./requirements_gpu.txt
 pip uninstall orjson
 ```
+You can also choose `requirements_windows_DirectML.txt` which supports various GPUs on Windows. If you are on Linux or MacOS, modify the `onnxruntime` part in the requirements, and install one variant according to [Onnxruntime execution providers](https://onnxruntime.ai/docs/execution-providers/).
 
 ## CPU usage
 
@@ -76,20 +78,14 @@ Directly run
 python main.py
 ```
 
-## GPU usage for NVIDIA graphics cards
-`LocalSearch` uses `onnxruntime-gpu` for calculating the text embeddings. Bundling the required `onnxruntime-gpu` and `torch` for the GPU version would make the release files too large.
+## GPU usage
+`LocalSearch` uses `onnxruntime-gpu` or `onnxruntime-directml` (or other variants, depending on your choice) for calculating the text embeddings. 
 
 To run the app using GPU, use
 ```aiignore
-python main.py --gpu
+python main.py 
 ```
-
-## GPU usage for other GPUs
-If you are using a GPU other than NVIDIA, you can install the correct onnxruntime version by following the instructions in  [execution providers](https://onnxruntime.ai/docs/execution-providers/).
-
-Then, modify the `CUDAExecutionProvider` in the line
-`session = ort.InferenceSession(EMBEDDING_MODEL_ONNX_FILE, providers=["CUDAExecutionProvider"])`
-of the file `searcher_onnx.py` accordingly.
+The code automatically detects whether your hardware supports GPU acceleration.
 
 # Advanced configurations
 ## Changing embedding model
@@ -97,7 +93,7 @@ By default, the program uses the multilingual-e5-small model for embedding. You 
 
 Then, go to `configs.py` and modify the `EMBEDDING_MODEL_TOKEN_LENGTH` `EMBEDDING_DIM` variables accordingly.
 
-By default, when you run `main.py` with the `--gpu` flag, it will prefer using the `model_gpu.onnx` file by default, and fallback to `model.onnx` if `model_gpu.onnx` is non-existent.
+By default, when your computer has a GPU, it will prefer using the `model_gpu.onnx` file by default, and fallback to `model.onnx` if `model_gpu.onnx` is non-existent.
 
 You may want to switch to heavier models like multilingual-e5-base, BGE-M3, EmbeddingGemma-300M, if your GPU is powerful and you don't have too many files for indexing. 
 

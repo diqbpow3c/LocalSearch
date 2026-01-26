@@ -6,7 +6,7 @@ APP_VERSION = "0.0.2"
 STOPWORDS = [" ", ",", "，", "。", "的", "‘", "’", "“", "”", "、","_","-"]
 SCRIPT_DIR = Path(__file__).resolve().parent
 
-DEVICE='cpu'  # 'cpu' or 'gpu'
+DEVICE='CPU'  # placeholder
 
 def get_English_only_folder() -> Path:
     """

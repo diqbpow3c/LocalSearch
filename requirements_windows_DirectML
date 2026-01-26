@@ -1,0 +1,21 @@
+langchain
+langchain-text-splitters
+faiss-cpu
+rjieba
+PySide6
+unstructured[csv,docx,md,odt,rst,xlsx,pptx] # no pdf
+bm25s
+PyStemmer
+tokenizers
+pypdf
+sympy
+numpy
+torch
+onnxruntime-directml
+python-docx
+markdown
+python-pptx
+qt_material
+pymupdf
+watchdog
+pyshortcuts

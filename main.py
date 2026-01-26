@@ -296,8 +296,7 @@ class SettingsTab(QWidget):
         if is_running_in_pyinstaller():
             command = app_path + " --autostart"
         else:
-            gpu_arg = ' --gpu' if '--gpu' in sys.argv else ''
-            command = f'"{sys.executable}" "{script_path}" --autostart {gpu_arg}'
+            command = f'"{sys.executable}" "{script_path}" --autostart '
         if sys.platform.startswith("win"):
             import winreg
 
@@ -461,14 +460,13 @@ class MainWindow(QMainWindow):
         self.tray_icon.activated.connect(self.on_tray_icon_activated)
         self.tray_icon.show()
 
-        if configs.DEVICE=='gpu':
-            try:
-                self.searcher = Searcher()
-            except Exception as e:
-                logger.error(e)
-                QMessageBox.warning(self, "GPU initialization error", f"Error {e}. You need to install torch (GPU version) along with onnxruntime-gpu correctly.")
-        else:
+
+        try:
             self.searcher = Searcher()
+        except Exception as e:
+            logger.error(e)
+            QMessageBox.warning(self, "Device initialization error", f"Error {e}. You need to install onnxruntime-gpu/directml along with dependencies correctly.")
+
 
         self.searcher.index_rebuild_progress_signal.connect(
             self.on_rebuild_signal_progress
@@ -504,9 +502,8 @@ class MainWindow(QMainWindow):
             if not is_running_in_pyinstaller():
                 from pyshortcuts import make_shortcut
                 script_path = Path(__file__).resolve()
-                gpu_arg = ' --gpu' if '--gpu' in sys.argv else ''
-                # command = f'"{sys.executable}" "{script_path}" {gpu_arg}'
-                command = f'"{script_path}" {gpu_arg}' # pyshortcuts already appends conda-related commands
+                # command = f'"{sys.executable}" "{script_path}" '
+                command = f'"{script_path}" ' # pyshortcuts already appends conda-related commands
                 icon_path = str(SCRIPT_DIR / "resources/icon.ico")
                 make_shortcut(command, name='LocalSearch', icon=icon_path,working_dir=str(SCRIPT_DIR),terminal=False)
                 logger.info("Shortcut created on desktop")
@@ -1380,9 +1377,6 @@ class CustomSplashScreen(QWidget):
 def main():
     app = QApplication(sys.argv)
     is_autostart = AUTOSTART_ARG in sys.argv
-    use_gpu = '--gpu' in sys.argv
-    if use_gpu:
-        configs.DEVICE='gpu'
     logger.info(f"Application launched. Is autostart: {is_autostart}")
     app.settings = QSettings("LocalSearch", "LocalSearch")
     app.setWindowIcon(QIcon(str(SCRIPT_DIR / "resources/icon.png")))

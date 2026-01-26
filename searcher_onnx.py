@@ -44,7 +44,7 @@ class Searcher(QObject):
             folder_paths (list): A list of initial folder paths to index.
         """
         super().__init__()
-        self.device = configs.DEVICE
+        self.device = None
         self.file_paths = set(file_paths) if file_paths else set()
         self.folder_paths = set(folder_paths) if folder_paths else set()
 
@@ -79,17 +79,29 @@ class Searcher(QObject):
         self.embedding_tokenizer.enable_padding(length=EMBEDDING_MODEL_TOKEN_LENGTH)
 
         session_options = ort.SessionOptions()
+        session_options.set_provider_selection_policy(ort.OrtExecutionProviderDevicePolicy.MAX_PERFORMANCE)
         # session_options.log_severity_level=1
         model_file = EMBEDDING_MODEL_ONNX_FILE
-        if self.device == 'cpu':
+        onnx_gpu_file = EMBEDDING_MODEL_ONNX_FILE.replace("model.onnx", "model_gpu.onnx")
+        available_providers = ort.get_available_providers()
+        if len(available_providers)==1: # 'CPUExecutionProvider'
             session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CPUExecutionProvider"])
-        else:
+        elif '' in available_providers:
             ort.preload_dlls()
-            onnx_gpu_file = EMBEDDING_MODEL_ONNX_FILE.replace("model.onnx", "model_gpu.onnx")
             if os.path.exists(onnx_gpu_file):
                 model_file = onnx_gpu_file
-            session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CUDAExecutionProvider","CPUExecutionProvider"])
+            # session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CUDAExecutionProvider","CPUExecutionProvider"])
+            session = ort.InferenceSession(model_file, sess_options=session_options)
+        else: # directml or other
+            if os.path.exists(onnx_gpu_file):
+                model_file = onnx_gpu_file
+            session = ort.InferenceSession(model_file, sess_options=session_options)
+        current_providers = session.get_providers()
+        current_providers = [curr.replace('ExecutionProvider','') for curr in current_providers]
+        self.device = current_providers
+        configs.DEVICE=current_providers
         self.embedding_model = session
+        logger.info(f"Using providers: {current_providers}")
         logger.info(f"Using onnx file {model_file}")
 
     def _encode(self, texts, batch_size=EMBEDDING_ENCODING_BATCH_SIZE):
