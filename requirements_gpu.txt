@@ -2,7 +2,7 @@ langchain
 langchain-text-splitters
 faiss-cpu
 rjieba
-pyside6
+PySide6
 unstructured[csv,docx,md,odt,rst,xlsx,pptx] # no pdf
 bm25s
 PyStemmer
