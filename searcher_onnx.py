@@ -91,12 +91,15 @@ class Searcher(QObject):
             ort.preload_dlls()
             if os.path.exists(onnx_gpu_file):
                 model_file = onnx_gpu_file
-            # session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CUDAExecutionProvider","CPUExecutionProvider"])
-            session = ort.InferenceSession(model_file, sess_options=session_options)
+            session = ort.InferenceSession(model_file, sess_options=session_options,
+                                           providers=["CUDAExecutionProvider","CPUExecutionProvider"])
         else: # directml or other
             if os.path.exists(onnx_gpu_file):
                 model_file = onnx_gpu_file
-            session = ort.InferenceSession(model_file, sess_options=session_options)
+            providers = [p for p in available_providers if p != "CPUExecutionProvider"]
+            if "CPUExecutionProvider" in available_providers:
+                providers.append("CPUExecutionProvider")
+            session = ort.InferenceSession(model_file, sess_options=session_options,providers=providers)
         current_providers = session.get_providers()
         current_providers = [curr.replace('ExecutionProvider','') for curr in current_providers]
         self.device = current_providers
