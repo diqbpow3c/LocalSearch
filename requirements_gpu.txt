@@ -7,7 +7,6 @@ unstructured[csv,docx,md,odt,rst,xlsx,pptx] # no pdf
 bm25s
 PyStemmer
 tokenizers
-pypdf
 sympy
 numpy
 torch

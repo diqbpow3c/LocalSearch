@@ -12,7 +12,6 @@ import Stemmer
 from tokenizers import Tokenizer as EmbTokenizer
 from unstructured.partition.auto import partition
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
 import rjieba
 import numpy as np
 from pathlib import Path
@@ -22,6 +21,8 @@ import onnxruntime as ort
 import pickle
 import configs
 from configs import *
+import pymupdf
+from utils import sanitize_pdf_text
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class Searcher(QObject):
         available_providers = ort.get_available_providers()
         if len(available_providers)==1: # 'CPUExecutionProvider'
             session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CPUExecutionProvider"])
-        elif '' in available_providers:
+        elif 'CUDAExecutionProvider' in available_providers:
             ort.preload_dlls()
             if os.path.exists(onnx_gpu_file):
                 model_file = onnx_gpu_file
@@ -131,27 +132,31 @@ class Searcher(QObject):
     @staticmethod
     def _read_file_content(file_path):
         # avoid bloat in unstructured[pdf]. # elements = partition(file_path, strategy='fast')
-        logger.info(f"Parsing{file_path}")
         try:
             if str(Path(file_path).suffix) == ".pdf":
-                reader = PdfReader(file_path)
-                full_text = "\n".join([page.extract_text() for page in reader.pages])
+                doc = pymupdf.open(file_path)
+                full_text = ""
+                for page in doc:
+                    full_text += page.get_text()
+                doc.close()
+                full_text = sanitize_pdf_text(full_text)
             elif str(Path(file_path).suffix) in NO_CONTENT_PARSING_EXTENSIONS:
                 return ""
             else:
-                elements = partition(str(Path(file_path)))
+                elements = partition(str(Path(file_path)),strategy="fast",infer_table_structure=False)
                 full_text = "\n".join(
                     element.text for element in elements if element.text
                 )
             logger.info(f"Successfully parsed file {file_path}")
             return full_text
         except Exception as e:
-            logger.info(f"Can't parse file content for {file_path}, {e}")
+            logger.warning(f"Can't parse file content for {file_path}, {e}")
             return None
 
     @staticmethod
     def _tokenize(text):
         return rjieba.cut_for_search(text.lower())
+
 
     def rebuild_index(self):
         """
@@ -187,6 +192,8 @@ class Searcher(QObject):
                             files_to_index.add(os.path.join(root, file))
         files_to_index.update(self.file_paths)
         total_files = len(files_to_index)
+
+
         for idx, file_path in enumerate(files_to_index):
             self.index_rebuild_progress_signal.emit(
                 f"Rebuild index,{idx + 1}/{total_files}, {str(Path(file_path))}"

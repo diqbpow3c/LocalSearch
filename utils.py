@@ -35,3 +35,25 @@ def highlight_keywords_in_text(text, highlight_words, query, max_length=200):
             )
 
     return escaped_text
+
+
+
+def sanitize_pdf_text(text: str) -> str:
+    if not text:
+        return ""
+
+    # 1. Remove mid-sentence "hard breaks"
+    # This looks for a newline that is NOT preceded by a period, question mark, or exclamation
+    # and is followed by a lowercase letter (indicating the sentence continues).
+    text = re.sub(r'(?<![.!?])\n(?=[a-z])', ' ', text)
+
+    # 2. Normalize multiple newlines
+    # Converts any sequence of 3+ newlines into exactly 2 (clean paragraph separation)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
+    # 3. Clean up horizontal whitespace
+    # Replaces tabs and multiple spaces with a single space
+    text = re.sub(r'[ \t]+', ' ', text)
+
+    # 4. Final trim
+    return text.strip()
