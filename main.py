@@ -44,6 +44,10 @@ logger = logging.getLogger(__name__)
 
 from misc_threads import *
 
+import importlib.util
+spec = importlib.util.find_spec("orjson")
+if spec:
+    logger.error("orjson has to be uninstalled for this program to run!!!")
 
 class UniversalPreviewPane(QStackedWidget):
     def __init__(self, parent=None):
@@ -1421,7 +1425,7 @@ def main():
         splash.close()
 
 
-    app.exec_()
+    app.exec()
     # sys.exit(app.exec())
 if __name__ == "__main__":
     main()

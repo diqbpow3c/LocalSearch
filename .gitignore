@@ -7,3 +7,4 @@ dist/
 tstdocs/
 local_misc/
 local_search/
+.venv/

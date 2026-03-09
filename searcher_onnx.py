@@ -78,12 +78,17 @@ class Searcher(QObject):
     def _load_embedding_model(self):
         self.embedding_tokenizer = EmbTokenizer.from_file(EMBEDDING_TOKENIZER_FILE)
         self.embedding_tokenizer.enable_padding(length=EMBEDDING_MODEL_TOKEN_LENGTH)
-
         session_options = ort.SessionOptions()
         session_options.set_provider_selection_policy(ort.OrtExecutionProviderDevicePolicy.MAX_PERFORMANCE)
         # session_options.log_severity_level=1
         model_file = EMBEDDING_MODEL_ONNX_FILE
         onnx_gpu_file = EMBEDDING_MODEL_ONNX_FILE.replace("model.onnx", "model_gpu.onnx")
+
+        # Uncomment to generate an optimized onnx file for faster startup of program
+        session_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        optimized_model_file = EMBEDDING_MODEL_ONNX_FILE.replace("model.onnx","model_optimized.onnx")
+        # session_options.optimized_model_filepath = optimized_model_file
+
         available_providers = ort.get_available_providers()
         if len(available_providers)==1: # 'CPUExecutionProvider'
             session = ort.InferenceSession(model_file, sess_options=session_options,providers=["CPUExecutionProvider"])
@@ -91,6 +96,8 @@ class Searcher(QObject):
             ort.preload_dlls()
             if os.path.exists(onnx_gpu_file):
                 model_file = onnx_gpu_file
+            if os.path.exists(optimized_model_file):
+                model_file = optimized_model_file
             session = ort.InferenceSession(model_file, sess_options=session_options,
                                            providers=["CUDAExecutionProvider","CPUExecutionProvider"])
         else: # directml or other

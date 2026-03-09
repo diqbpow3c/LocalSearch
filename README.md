@@ -2,10 +2,12 @@
   <img src="resources/icon.png" width="350" />
 </p>
 
+[English](./README.md) | [中文文档](./README-zh.md)
+
 # LocalSearch
 A privacy-first pyside6 desktop app for searching for content in your local files and folders, using both lexical (keyword) search (BM25) and embedding similarity. Compatible with Windows, Linux, and MacOS. 
 
-The UI design is inspired by  [gety.ai](https://gety.ai/) (not released as of January 2026). 
+The UI design is inspired by  [gety.ai](https://gety.ai/). 
 
 # Why LocalSearch
 Have you ever tried to **search for something in the content of your hundreds of documents** on local computer, but **can't remember  the words exactly**? For instance, you want to search for "solar power", but the files actually use the term "photovoltaic arrays". 
