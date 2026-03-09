@@ -52,7 +52,7 @@ You can directly **download it from the release files** if you are on Windows. T
 
 First, download the repo (download zip file) or 
 ```
-git clone https://github.com/diqbpow3c/LocalSearch.git
+git clone https://github.com/neural-koala/LocalSearch.git
 cd LocalSearch
 ```
 You might also need to use `git lfs pull` if the onnx model files are not properly downloaded to the `resources/embedding_model` directory.

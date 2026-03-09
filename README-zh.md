@@ -66,7 +66,7 @@ UI 设计灵感来源于 [gety.ai](https://gety.ai/)。
 首先，下载仓库（下载 ZIP 或使用 Git）：
 
 ```bash
-git clone https://github.com/diqbpow3c/LocalSearch.git
+git clone https://github.com/neural-koala/LocalSearch.git
 cd LocalSearch
 
 ```
